@@ -9,6 +9,7 @@ import { logger } from './utils/logger';
 // Routes
 import baseRoutes from './routes/index';
 import userRoutes from './routes/user.routes';
+import authRoutes from './routes/auth.routes';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/', baseRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {
@@ -41,7 +43,7 @@ app.use((req, res) => {
       'GET /health',
       'GET /api/v1/users',
       'POST /api/v1/users',
-      'POST /api/v1/users/login'
+      'POST /api/v1/auth/login'
     ]
   });
 });

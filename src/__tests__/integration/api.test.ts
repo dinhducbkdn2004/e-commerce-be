@@ -60,7 +60,7 @@ describe('User API Integration Tests', () => {
     });
   });
 
-  describe('POST /api/v1/users/login', () => {
+  describe('POST /api/v1/auth/login', () => {
     beforeEach(async () => {
       // Create a test user
       await request(app)
@@ -74,7 +74,7 @@ describe('User API Integration Tests', () => {
 
     it('should login successfully with valid credentials', async () => {
       const response = await request(app)
-        .post('/api/v1/users/login')
+        .post('/api/v1/auth/login')
         .send({
           username: 'logintest',
           password: 'password123',
@@ -88,7 +88,7 @@ describe('User API Integration Tests', () => {
 
     it('should return 401 for invalid credentials', async () => {
       const response = await request(app)
-        .post('/api/v1/users/login')
+        .post('/api/v1/auth/login')
         .send({
           username: 'logintest',
           password: 'wrongpassword',
@@ -100,7 +100,7 @@ describe('User API Integration Tests', () => {
 
     it('should return 400 for missing credentials', async () => {
       const response = await request(app)
-        .post('/api/v1/users/login')
+        .post('/api/v1/auth/login')
         .send({})
         .expect(400);
 

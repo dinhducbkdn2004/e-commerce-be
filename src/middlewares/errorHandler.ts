@@ -19,14 +19,15 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  // Log error
+  // Log error với đầy đủ thông tin
   logger.error({
     message: err.message,
     stack: err.stack,
     url: req.url,
     method: req.method,
     ip: req.ip,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    statusCode: err.statusCode || 500
   });
 
   // Handle different error types
@@ -51,9 +52,24 @@ export const errorHandler = (
   const status = err.statusCode || 500;
   const message = err.isOperational ? err.message : 'Internal Server Error';
 
-  res.status(status).json({
+  // Response structure
+  const errorResponse: any = {
     status: 'error',
-    message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+    message
+  };
+
+  // Chỉ thêm stack trace trong development và chỉ cho internal server errors
+  // Không show stack cho authentication/authorization errors vì lý do security
+  if (process.env.NODE_ENV === 'development' && 
+      status === 500 && 
+      !err.isOperational) {
+    errorResponse.stack = err.stack;
+  }
+
+  // Thêm error code cho development để dễ debug
+  if (process.env.NODE_ENV === 'development') {
+    errorResponse.errorCode = err.name || 'UnknownError';
+  }
+
+  res.status(status).json(errorResponse);
 };
