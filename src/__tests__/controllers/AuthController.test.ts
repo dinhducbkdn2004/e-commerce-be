@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthController } from '../../controllers/AuthController';
 import { UserService } from '../../services/UserService';
 import { AppError } from '../../middlewares/errorHandler';
+import { Types } from 'mongoose';
 
 jest.mock('../../services/UserService');
 
@@ -40,9 +41,9 @@ describe('AuthController', () => {
 
       const loginResult = {
         user: {
-          id: 'user123',
+          id: new Types.ObjectId(),
           username: loginData.username,
-          role: 'user',
+          role: 'user' as 'user' | 'admin',
         },
         token: 'jwt_token_here',
       };
