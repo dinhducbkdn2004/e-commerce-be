@@ -13,7 +13,7 @@ import { logger } from './utils/logger';
 // Routes
 import baseRoutes from './routes/index';
 import userRoutes from './routes/user.routes';
-import authRoutes from './routes/auth.routes';
+import authenticationRoutes from './routes/user/authentication.routes';
 
 const app = express();
 
@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Body parsing middleware
 
 // Swagger API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
   explorer: true, // Cho phép khám phá schema
   customSiteTitle: 'E-Commerce API Documentation', // Chỉ tùy chỉnh tiêu đề trang
   swaggerOptions: {
@@ -47,7 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
 // Routes
 app.use('/', baseRoutes);
 app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authenticationRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {
@@ -61,7 +61,7 @@ app.use((req, res) => {
       'GET /api/v1/users',
       'POST /api/v1/users',
       'POST /api/v1/auth/login',
-      'GET /api-docs' // Added Swagger documentation route
+      'GET /docs' // Added Swagger documentation route
     ]
   });
 });

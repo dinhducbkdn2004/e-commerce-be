@@ -1,23 +1,29 @@
-# My Backend API
+# E-Commerce Backend API
 
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.x-green.svg)](https://www.mongodb.com/)
 [![Express](https://img.shields.io/badge/Express-5.x-black.svg)](https://expressjs.com/)
 [![Jest](https://img.shields.io/badge/Jest-30.x-red.svg)](https://jestjs.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A modern, scalable REST API built with Node.js, TypeScript, Express, and MongoDB following clean architecture principles.
+A comprehensive e-commerce backend API built with Node.js, TypeScript, Express, and MongoDB following clean architecture principles. This project provides all the necessary backend services for a modern e-commerce platform including user management, product catalog, shopping cart, orders, wishlist, and more.
 
 ## 🚀 Features
 
 - **Clean Architecture** - Separation of concerns with layered architecture
 - **TypeScript** - Type safety and better developer experience
 - **Authentication & Authorization** - JWT-based auth with role-based access
+- **User Management** - Registration, profile management, addresses
+- **Shopping Cart** - Add, update, remove items with persistence
+- **Order Processing** - Create, track, and manage orders
+- **Wishlist** - Save products for later
+- **Loyalty Program** - Points system and vouchers
 - **Comprehensive Logging** - Winston logger with Morgan HTTP logging
 - **Security** - Helmet, CORS, Rate limiting, and input validation
 - **Testing** - Unit tests, integration tests, and test coverage
-- **Code Quality** - ESLint, Prettier, and pre-commit hooks
-- **Documentation** - Comprehensive API documentation
+- **API Documentation** - Swagger/OpenAPI documentation
+- **Error Handling** - Centralized error handling with proper responses
 
 ## 📋 Table of Contents
 
@@ -41,8 +47,8 @@ A modern, scalable REST API built with Node.js, TypeScript, Express, and MongoDB
 ### Clone the repository
 
 ```bash
-git clone <repository-url>
-cd my-backend
+git clone https://github.com/your-username/e-commerce-be.git
+cd e-commerce-be
 ```
 
 ### Install dependencies
@@ -298,6 +304,52 @@ This project follows **Clean Architecture** principles:
 Request → Controller → Service → Repository → Database
 Response ← Controller ← Service ← Repository ← Database
 ```
+
+## 🏗️ Project Structure
+
+```
+e-commerce-be/
+├── src/                 # Source code
+│   ├── config/          # Application configuration
+│   ├── controllers/     # Request handlers
+│   │   └── user/        # User-related controllers
+│   ├── docs/            # API documentation
+│   ├── dtos/            # Data Transfer Objects
+│   ├── middlewares/     # Express middlewares
+│   ├── models/          # Mongoose models
+│   ├── repositories/    # Data access layer
+│   │   └── user/        # User-related repositories
+│   ├── routes/          # API routes
+│   │   └── user/        # User-related routes
+│   ├── services/        # Business logic
+│   │   └── user/        # User-related services
+│   ├── utils/           # Utility functions
+│   ├── validators/      # Input validation schemas
+│   ├── app.ts           # Express app setup
+│   └── server.ts        # Server entry point
+├── logs/                # Application logs
+├── scripts/             # Utility scripts
+├── __tests__/           # Test files
+│   ├── integration/     # Integration tests
+│   ├── controllers/     # Controller tests
+│   ├── services/        # Service tests
+│   └── repositories/    # Repository tests
+├── jest.config.js       # Jest configuration
+├── tsconfig.json        # TypeScript configuration
+└── package.json         # Project dependencies
+```
+
+The project follows a clean architecture pattern with clear separation of concerns:
+
+1. **Models**: Database schemas and interfaces
+2. **DTOs**: Data transfer objects for API requests/responses
+3. **Repositories**: Data access layer that interacts with the database
+4. **Services**: Business logic layer
+5. **Controllers**: Handle HTTP requests and responses
+6. **Routes**: Define API endpoints
+7. **Middlewares**: Handle cross-cutting concerns like auth, validation, etc.
+8. **Utils**: Shared utility functions
+9. **Config**: Application configuration
 
 ## 🛡️ Security Features
 

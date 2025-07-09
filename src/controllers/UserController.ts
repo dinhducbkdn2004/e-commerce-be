@@ -1,188 +1,55 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../services/UserService';
-import { logger } from '../utils/logger';
+import { BaseUserController } from './user/BaseUserController';
+import { AddressController } from './user/AddressController';
+import { CartController } from './user/CartController';
+import { WishlistController } from './user/WishlistController';
+import { AuthenticationController } from './user/AuthenticationController';
+import { LoyaltyController } from './user/LoyaltyController';
+import { OrderController } from './user/OrderController';
 
+// Facade controller that delegates to appropriate sub-controllers
 export class UserController {
-  private userService = new UserService();
+  private baseController: BaseUserController = new BaseUserController();
+  private addressController: AddressController = new AddressController();
+  private cartController: CartController = new CartController();
+  private wishlistController: WishlistController = new WishlistController();
+  private authController: AuthenticationController = new AuthenticationController();
+  private loyaltyController: LoyaltyController = new LoyaltyController();
+  private orderController: OrderController = new OrderController();
 
-  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // HTTP request tracking - log ở Controller
-      logger.info('Create user request received', {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-      });
+  // Base user controller methods
+  create = this.baseController.create.bind(this.baseController);
+  getAll = this.baseController.getAll.bind(this.baseController);
+  getById = this.baseController.getById.bind(this.baseController);
+  update = this.baseController.update.bind(this.baseController);
+  delete = this.baseController.delete.bind(this.baseController);
 
-      const user = await this.userService.createUser(req.body);
-      
-      // HTTP success tracking - log ở Controller
-      logger.info('Create user request completed successfully', {
-        userId: user._id,
-        statusCode: 201
-      });
+  // Address controller methods
+  addAddress = this.addressController.addAddress.bind(this.addressController);
+  updateAddress = this.addressController.updateAddress.bind(this.addressController);
+  removeAddress = this.addressController.removeAddress.bind(this.addressController);
 
-      res.status(201).json({
-        status: 'success',
-        data: user
-      });
-    } catch (error) {
-      // HTTP error tracking - log ở Controller
-      logger.error('Create user request failed', {
-        ip: req.ip,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-  
-  async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // HTTP request tracking - log ở Controller
-      logger.info('Get all users request received', {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-      });
+  // Cart controller methods
+  addToCart = this.cartController.addToCart.bind(this.cartController);
+  updateCartItem = this.cartController.updateCartItem.bind(this.cartController);
+  removeFromCart = this.cartController.removeFromCart.bind(this.cartController);
+  clearCart = this.cartController.clearCart.bind(this.cartController);
 
-      const users = await this.userService.getAllUsers();
-      
-      // HTTP success tracking - log ở Controller
-      logger.info('Get all users request completed successfully', {
-        userCount: users.length,
-        statusCode: 200
-      });
+  // Wishlist controller methods
+  addToWishlist = this.wishlistController.addToWishlist.bind(this.wishlistController);
+  removeFromWishlist = this.wishlistController.removeFromWishlist.bind(this.wishlistController);
 
-      res.status(200).json({
-        status: 'success',
-        data: users
-      });
-    } catch (error) {
-      // HTTP error tracking - log ở Controller
-      logger.error('Get all users request failed', {
-        ip: req.ip,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
+  // Authentication controller methods
+  verifyEmail = this.authController.verifyEmail.bind(this.authController);
+  resendVerificationEmail = this.authController.resendVerificationEmail.bind(this.authController);
+  requestPasswordReset = this.authController.requestPasswordReset.bind(this.authController);
+  resetPassword = this.authController.resetPassword.bind(this.authController);
 
-  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId = req.params.id;
+  // Loyalty controller methods
+  updatePoints = this.loyaltyController.updatePoints.bind(this.loyaltyController);
+  addVoucher = this.loyaltyController.addVoucher.bind(this.loyaltyController);
+  removeVoucher = this.loyaltyController.removeVoucher.bind(this.loyaltyController);
 
-      // HTTP request tracking - log ở Controller
-      logger.info(`Get user by ID request received for user ${userId}`, {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-      });
-
-      const user = await this.userService.getUserById(userId);
-      
-      if (!user) {
-        logger.warn(`User not found with ID ${userId}`, { userId });
-        res.status(404).json({
-          status: 'error',
-          message: `User with ID ${userId} not found`
-        });
-        return;
-      }
-
-      // HTTP success tracking - log ở Controller
-      logger.info(`Get user by ID request completed successfully for user ${userId}`, {
-        statusCode: 200
-      });
-
-      res.status(200).json({
-        status: 'success',
-        data: user
-      });
-    } catch (error) {
-      // HTTP error tracking - log ở Controller
-      logger.error(`Get user by ID request failed for user ${req.params.id}`, {
-        ip: req.ip,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
-  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId = req.params.id;
-
-      // HTTP request tracking - log ở Controller
-      logger.info(`Update user request received for user ${userId}`, {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-      });
-
-      const updatedUser = await this.userService.updateUser(userId, req.body);
-      
-      if (!updatedUser) {
-        logger.warn(`User not found for update with ID ${userId}`, { userId });
-        res.status(404).json({
-          status: 'error',
-          message: `User with ID ${userId} not found`
-        });
-        return;
-      }
-
-      // HTTP success tracking - log ở Controller
-      logger.info(`Update user request completed successfully for user ${userId}`, {
-        statusCode: 200
-      });
-
-      res.status(200).json({
-        status: 'success',
-        data: updatedUser
-      });
-    } catch (error) {
-      // HTTP error tracking - log ở Controller
-      logger.error(`Update user request failed for user ${req.params.id}`, {
-        ip: req.ip,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
-  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId = req.params.id;
-
-      // HTTP request tracking - log ở Controller
-      logger.info(`Delete user request received for user ${userId}`, {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-      });
-
-      const deletedUser = await this.userService.deleteUser(userId);
-      
-      if (!deletedUser) {
-        logger.warn(`User not found for deletion with ID ${userId}`, { userId });
-        res.status(404).json({
-          status: 'error',
-          message: `User with ID ${userId} not found`
-        });
-        return;
-      }
-
-      // HTTP success tracking - log ở Controller
-      logger.info(`Delete user request completed successfully for user ${userId}`, {
-        statusCode: 200
-      });
-
-      res.status(200).json({
-        status: 'success',
-        data: deletedUser
-      });
-    } catch (error) {
-      // HTTP error tracking - log ở Controller
-      logger.error(`Delete user request failed for user ${req.params.id}`, {
-        ip: req.ip,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      next(error);
-    }
-  }
-
+  // Order controller methods
+  addOrder = this.orderController.addOrder.bind(this.orderController);
 }

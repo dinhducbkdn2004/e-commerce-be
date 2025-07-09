@@ -1,169 +1,55 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { UserRepository } from '../repositories/UserRepository';
-import { CreateUserDTO } from '../dtos/user.dto';
-import { AppError } from '../middlewares/errorHandler';
-import { logger } from '../utils/logger';
-import { config } from '../config';
+import { BaseUserService } from './user/BaseUserService';
+import { AddressService } from './user/AddressService';
+import { CartService } from './user/CartService';
+import { WishlistService } from './user/WishlistService';
+import { AuthenticationService } from './user/AuthenticationService';
+import { LoyaltyService } from './user/LoyaltyService';
+import { OrderService } from './user/OrderService';
 
+// Composite service that brings together all user-related functionality
 export class UserService {
-    private userRepo = new UserRepository();
+    private baseUserService: BaseUserService = new BaseUserService();
+    private addressService: AddressService = new AddressService();
+    private cartService: CartService = new CartService();
+    private wishlistService: WishlistService = new WishlistService();
+    private authService: AuthenticationService = new AuthenticationService();
+    private loyaltyService: LoyaltyService = new LoyaltyService();
+    private orderService: OrderService = new OrderService();
 
-    async createUser(data: CreateUserDTO) {
-        try {
-            const existingUser = await this.userRepo.findByUsername(data.username);
+    // Base user methods
+    createUser = this.baseUserService.createUser.bind(this.baseUserService);
+    login = this.baseUserService.login.bind(this.baseUserService);
+    getAllUsers = this.baseUserService.getAllUsers.bind(this.baseUserService);
+    getUserById = this.baseUserService.getUserById.bind(this.baseUserService);
+    updateUser = this.baseUserService.updateUser.bind(this.baseUserService);
+    deleteUser = this.baseUserService.deleteUser.bind(this.baseUserService);
 
-            if (existingUser) {
-                throw new AppError('Username already exists', 409);
-            }
+    // Address methods
+    addAddress = this.addressService.addAddress.bind(this.addressService);
+    updateAddress = this.addressService.updateAddress.bind(this.addressService);
+    removeAddress = this.addressService.removeAddress.bind(this.addressService);
 
-            const hashedPassword = await bcrypt.hash(data.password, 12);
+    // Cart methods
+    addToCart = this.cartService.addToCart.bind(this.cartService);
+    updateCartItem = this.cartService.updateCartItem.bind(this.cartService);
+    removeFromCart = this.cartService.removeFromCart.bind(this.cartService);
+    clearCart = this.cartService.clearCart.bind(this.cartService);
 
-            const user = await this.userRepo.create({
-                ...data,
-                password: hashedPassword
-            });
+    // Wishlist methods
+    addToWishlist = this.wishlistService.addToWishlist.bind(this.wishlistService);
+    removeFromWishlist = this.wishlistService.removeFromWishlist.bind(this.wishlistService);
 
-            // Business event - log ở Service
-            logger.info('User created successfully', {
-                userId: user._id,
-                username: user.username,
-                role: user.role
-            });
+    // Authentication methods
+    verifyEmail = this.authService.verifyEmail.bind(this.authService);
+    resendVerificationEmail = this.authService.resendVerificationEmail.bind(this.authService);
+    requestPasswordReset = this.authService.requestPasswordReset.bind(this.authService);
+    resetPassword = this.authService.resetPassword.bind(this.authService);
 
-            const { password, ...userWithoutPassword } = user.toObject();
-            return userWithoutPassword;
-        } catch (error) {
-            // Business error - log ở Service
-            logger.error('Error creating user', {
-                username: data.username,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw error;
-        }
-    }
+    // Loyalty methods
+    updatePoints = this.loyaltyService.updatePoints.bind(this.loyaltyService);
+    addVoucher = this.loyaltyService.addVoucher.bind(this.loyaltyService);
+    removeVoucher = this.loyaltyService.removeVoucher.bind(this.loyaltyService);
 
-    async login(username: string, password: string) {
-        try {
-            const user = await this.userRepo.findByUsername(username);
-            
-            if (!user || !await bcrypt.compare(password, user.password)) {
-                // Security event - log ở Service
-                logger.warn('Failed login attempt', {
-                    username,
-                    timestamp: new Date().toISOString()
-                });
-                throw new AppError('Invalid credentials', 401);
-            }
-
-            const token = jwt.sign(
-                { id: user._id, username: user.username, role: user.role },
-                config.JWT_SECRET,
-                { expiresIn: config.JWT_EXPIRES_IN } as jwt.SignOptions
-            );
-
-            // Security event - log ở Service
-            logger.info('User logged in successfully', {
-                userId: user._id,
-                username: user.username
-            });
-
-            return { token, user: { id: user._id, username: user.username, role: user.role } };
-        } catch (error) {
-            if (error instanceof AppError) {
-                throw error; // Đã được log ở trên
-            }
-            
-            logger.error('Login service error', {
-                username,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Login failed', 500);
-        }
-    }
-
-    async getAllUsers() {
-        try {
-            const users = await this.userRepo.findAll();
-            return users.map(user => {
-                const { password, ...userWithoutPassword } = user.toObject();
-                return userWithoutPassword;
-            });
-        } catch (error) {
-            logger.error('Error fetching all users', {
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Failed to fetch users', 500);
-        }
-    }
-
-    async getUserById(userId: string) {
-        try {
-            const user = await this.userRepo.findById(userId);
-            if (!user) {
-                throw new AppError('User not found', 404);
-            }
-            const { password, ...userWithoutPassword } = user.toObject();
-            return userWithoutPassword;
-        } catch (error) {
-            logger.error('Error fetching user by ID', {
-                userId,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Failed to fetch user', 500);
-        }
-    }
-
-    async updateUser(userId: string, data: Partial<CreateUserDTO>) {
-        try {
-            const user = await this.userRepo.findById(userId);
-            if (!user) {
-                throw new AppError('User not found', 404);
-            }
-
-            if (data.password) {
-                data.password = await bcrypt.hash(data.password, 12);
-            }
-
-            const updatedUser = await this.userRepo.update(userId, data);
-            
-            if (!updatedUser) {
-                throw new AppError('Failed to update user', 500);
-            }
-            
-            const { password, ...userWithoutPassword } = updatedUser.toObject();
-            return userWithoutPassword;
-        } catch (error) {
-            logger.error('Error updating user', {
-                userId,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Failed to update user', 500);
-        }
-    }
-
-    async deleteUser(userId: string) {
-        try {
-            const user = await this.userRepo.findById(userId);
-            if (!user) {
-                throw new AppError('User not found', 404);
-            }
-
-            await this.userRepo.delete(userId);
-
-            // Business event - log ở Service
-            logger.info('User deleted successfully', {
-                userId: user._id,
-                username: user.username
-            });
-
-            return { message: 'User deleted successfully' };
-        } catch (error) {
-            logger.error('Error deleting user', {
-                userId,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Failed to delete user', 500);
-        }
-    }
+    // Order methods
+    addOrder = this.orderService.addOrder.bind(this.orderService);
 }

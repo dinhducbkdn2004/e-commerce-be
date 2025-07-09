@@ -1,12 +1,67 @@
 import Joi from 'joi';
 
+// Base user validation
 export const createUserSchema = Joi.object({
-    username: Joi.string().min(3).max(30).required(),
-    password: Joi.string().min(6).max(100).required(),
-    role: Joi.string().valid('user', 'admin').default('user')
+    name: Joi.string().min(2).max(100).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).max(100).required(),
+    role: Joi.string().valid('user', 'admin').default('user'),
+    phoneNumber: Joi.string().pattern(/^[0-9+]+$/).min(10).max(15),
+    avatar: Joi.string().uri()
 });
 
 export const loginSchema = Joi.object({
-    username: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required()
+});
+
+export const updateUserSchema = Joi.object({
+    name: Joi.string().min(2).max(100),
+    email: Joi.string().email(),
+    password: Joi.string().min(8).max(100),
+    phoneNumber: Joi.string().pattern(/^[0-9+]+$/).min(10).max(15),
+    avatar: Joi.string().uri()
+}).min(1);
+
+// Address validation
+export const addressSchema = Joi.object({
+    fullName: Joi.string().min(2).max(100).required(),
+    phone: Joi.string().pattern(/^[0-9+]+$/).min(10).max(15).required(),
+    street: Joi.string().required(),
+    ward: Joi.string().required(),
+    district: Joi.string().required(),
+    city: Joi.string().required(),
+    isDefault: Joi.boolean().default(false)
+});
+
+export const updateAddressSchema = Joi.object({
+    addressId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    address: addressSchema.required()
+});
+
+// Cart validation
+export const cartItemSchema = Joi.object({
+    productId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+    quantity: Joi.number().integer().min(1).required(),
+    selectedSize: Joi.string(),
+    selectedColor: Joi.string()
+});
+
+export const updateCartSchema = cartItemSchema;
+
+// Password reset validation
+export const passwordResetRequestSchema = Joi.object({
+    email: Joi.string().email().required()
+});
+
+export const passwordResetConfirmSchema = Joi.object({
+    email: Joi.string().email().required(),
+    token: Joi.string().required(),
+    newPassword: Joi.string().min(8).max(100).required()
+});
+
+// Email verification
+export const emailVerificationSchema = Joi.object({
+    email: Joi.string().email().required(),
+    token: Joi.string().required()
 });
