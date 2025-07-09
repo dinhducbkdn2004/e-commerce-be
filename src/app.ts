@@ -1,5 +1,9 @@
 import express from 'express';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
+import path from 'path';
+import { specs } from './docs/swagger';
 import { corsMiddleware } from './middlewares/corsMiddleware';
 import { rateLimitMiddleware } from './middlewares/rateLimitMiddleware';
 import { morganMiddleware } from './utils/morganConfig';
@@ -27,6 +31,19 @@ app.use(morganMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Body parsing middleware
+
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  explorer: true, // Cho phép khám phá schema
+  customSiteTitle: 'E-Commerce API Documentation', // Chỉ tùy chỉnh tiêu đề trang
+  swaggerOptions: {
+    persistAuthorization: true, // Lưu trữ token xác thực
+    docExpansion: 'list', // Mở rộng tags, default của Swagger
+    filter: true // Cho phép tìm kiếm API
+  }
+}));
+
 // Routes
 app.use('/', baseRoutes);
 app.use('/api/v1/users', userRoutes);
@@ -43,7 +60,8 @@ app.use((req, res) => {
       'GET /health',
       'GET /api/v1/users',
       'POST /api/v1/users',
-      'POST /api/v1/auth/login'
+      'POST /api/v1/auth/login',
+      'GET /api-docs' // Added Swagger documentation route
     ]
   });
 });
