@@ -1,5 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
@@ -9,21 +10,43 @@ import { rateLimitMiddleware } from './middlewares/rateLimitMiddleware';
 import { morganMiddleware } from './utils/morganConfig';
 import { errorHandler } from './middlewares/errorHandler';
 import { logger } from './utils/logger';
+import { sessionConfig } from './middlewares/sessionMiddleware';
+import { attachCSRFToken } from './middlewares/csrfProtection';
+import { checkTokenBlacklist } from './middlewares/tokenBlacklist';
+import { redisClient } from './utils/redis';
 
 // Routes
 import baseRoutes from './routes/index';
 import userRoutes from './routes/user.routes';
 import authenticationRoutes from './routes/user/authentication.routes';
 import tokenRoutes from './routes/user/token.routes';
+import logoutRoutes from './routes/user/logout.routes';
 
 const app = express();
+
+// Initialize Redis connection
+redisClient.connect().catch(err => {
+  logger.error('Failed to connect to Redis', { error: err.message });
+});
 
 // Security middleware
 app.use(helmet());
 app.use(corsMiddleware);
 
+// Cookie parser
+app.use(cookieParser());
+
+// Session management
+app.use(sessionConfig);
+
+// CSRF token attachment
+app.use(attachCSRFToken);
+
 // Rate limiting
 app.use('/api', rateLimitMiddleware);
+
+// Token blacklist check
+app.use(checkTokenBlacklist);
 
 // Request logging
 app.use(morganMiddleware);
@@ -50,6 +73,7 @@ app.use('/', baseRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authenticationRoutes);
 app.use('/api/v1/tokens', tokenRoutes);
+app.use('/api/v1/logout', logoutRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {

@@ -173,7 +173,8 @@ export class AuthenticationService extends BaseUserService {
                 id: user._id, 
                 email: user.email, 
                 role: user.role,
-                type: 'access'
+                type: 'access',
+                jti: crypto.randomUUID() // Add JTI for blacklisting
             },
             config.JWT_SECRET,
             { expiresIn: config.JWT_EXPIRES_IN } as SignOptions

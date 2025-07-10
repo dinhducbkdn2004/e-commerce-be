@@ -27,6 +27,8 @@ export const config = {
     // Security
     BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || '12'),
     RATE_LIMIT_REQUESTS: parseInt(process.env.RATE_LIMIT_REQUESTS || '100'),
+    CSRF_SECRET: process.env.CSRF_SECRET || 'default-csrf-secret',
+    SESSION_SECRET: process.env.SESSION_SECRET || 'default-session-secret',
     
     // Logging
     LOG_LEVEL: process.env.LOG_LEVEL || 'info',

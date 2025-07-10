@@ -15,7 +15,8 @@ router.get('/', (req, res) => {
     endpoints: {
       users: '/api/v1/users',
       login: '/api/v1/users/login',
-      tokens: '/api/v1/tokens'
+      tokens: '/api/v1/tokens',
+      logout: '/api/v1/logout'
     }
   });
 });
