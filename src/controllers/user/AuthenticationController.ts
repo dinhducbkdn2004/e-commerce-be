@@ -52,7 +52,7 @@ export class AuthenticationController extends BaseUserController {
       });
 
       const { email, password } = req.body;
-      const result = await this.userService.login(email, password);
+      const result = await this.userService.login(email, password, req);
       
       logger.info('Login request completed successfully', {
         userId: result.user.id,

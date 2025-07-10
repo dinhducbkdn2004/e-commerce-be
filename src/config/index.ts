@@ -3,7 +3,7 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 
 // Validate required environment variables
 requiredEnvVars.forEach(envVar => {
@@ -17,7 +17,8 @@ export const config = {
     PORT: parseInt(process.env.PORT || '3000'),
     NODE_ENV: process.env.NODE_ENV || 'development',
     JWT_SECRET: process.env.JWT_SECRET!,
-    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1h',
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
     JWT_EXPIRES_IN_REFRESH: process.env.JWT_EXPIRES_IN_REFRESH || '7d',
     
     // Database

@@ -14,7 +14,8 @@ router.get('/', (req, res) => {
     health: '/health',
     endpoints: {
       users: '/api/v1/users',
-      login: '/api/v1/users/login'
+      login: '/api/v1/users/login',
+      tokens: '/api/v1/tokens'
     }
   });
 });

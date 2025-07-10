@@ -23,6 +23,10 @@ export class BaseUserRepository {
     return await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
   }
 
+  async updateUser(id: string, update: any, options?: any) {
+    return await User.findByIdAndUpdate(id, update, { new: true, ...options });
+  }
+
   async delete(id: string) {
     return await User.findByIdAndDelete(id);
   }

@@ -18,11 +18,12 @@ export class UserService {
 
     // Base user methods
     createUser = this.baseUserService.createUser.bind(this.baseUserService);
-    login = this.baseUserService.login.bind(this.baseUserService);
+    login = this.authService.login.bind(this.authService);
     getAllUsers = this.baseUserService.getAllUsers.bind(this.baseUserService);
     getUserById = this.baseUserService.getUserById.bind(this.baseUserService);
     updateUser = this.baseUserService.updateUser.bind(this.baseUserService);
     deleteUser = this.baseUserService.deleteUser.bind(this.baseUserService);
+    findById = this.baseUserService.findById.bind(this.baseUserService);
 
     // Address methods
     addAddress = this.addressService.addAddress.bind(this.addressService);
@@ -44,6 +45,9 @@ export class UserService {
     resendVerificationEmail = this.authService.resendVerificationEmail.bind(this.authService);
     requestPasswordReset = this.authService.requestPasswordReset.bind(this.authService);
     resetPassword = this.authService.resetPassword.bind(this.authService);
+    refreshAccessToken = this.authService.refreshAccessToken.bind(this.authService);
+    revokeRefreshToken = this.authService.revokeRefreshToken.bind(this.authService);
+    revokeAllRefreshTokens = this.authService.revokeAllRefreshTokens.bind(this.authService);
 
     // Loyalty methods
     updatePoints = this.loyaltyService.updatePoints.bind(this.loyaltyService);

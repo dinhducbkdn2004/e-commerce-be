@@ -54,53 +54,7 @@ export class BaseUserService {
         }
     }
 
-    async login(email: string, password: string) {
-        try {
-            const user = await this.userRepo.findByEmail(email);
-            
-            if (!user || !await bcrypt.compare(password, user.password)) {
-                // Security event - log ở Service
-                logger.warn('Failed login attempt', {
-                    email,
-                    timestamp: new Date().toISOString()
-                });
-                throw new AppError('Invalid credentials', 401);
-            }
-
-            const token = jwt.sign(
-                { id: user._id, email: user.email, role: user.role },
-                config.JWT_SECRET,
-                { expiresIn: config.JWT_EXPIRES_IN } as jwt.SignOptions
-            );
-
-            // Security event - log ở Service
-            logger.info('User logged in successfully', {
-                userId: user._id,
-                email: user.email
-            });
-
-            return { 
-                token, 
-                user: { 
-                    id: user._id, 
-                    name: user.name,
-                    email: user.email, 
-                    role: user.role,
-                    isEmailVerified: user.isEmailVerified 
-                } 
-            };
-        } catch (error) {
-            if (error instanceof AppError) {
-                throw error; // Đã được log ở trên
-            }
-            
-            logger.error('Login service error', {
-                email,
-                error: error instanceof Error ? error.message : 'Unknown error'
-            });
-            throw new AppError('Login failed', 500);
-        }
-    }
+    // Note: login method moved to AuthenticationService
 
     async getAllUsers() {
         try {
@@ -192,6 +146,25 @@ export class BaseUserService {
                 error: error instanceof Error ? error.message : 'Unknown error'
             });
             throw new AppError('Failed to delete user', 500);
+        }
+    }
+
+    async findById(id: string) {
+        try {
+            const user = await this.userRepo.findById(id);
+            if (!user) {
+                throw new AppError('User not found', 404);
+            }
+            return user;
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+            logger.error('Error finding user by ID', {
+                userId: id,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw new AppError('Failed to find user', 500);
         }
     }
 }

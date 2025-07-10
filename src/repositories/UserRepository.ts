@@ -21,6 +21,7 @@ export class UserRepository {
     findById = this.baseRepo.findById.bind(this.baseRepo);
     findAll = this.baseRepo.findAll.bind(this.baseRepo);
     update = this.baseRepo.update.bind(this.baseRepo);
+    updateUser = this.baseRepo.updateUser.bind(this.baseRepo);
     delete = this.baseRepo.delete.bind(this.baseRepo);
 
     // Address repository methods

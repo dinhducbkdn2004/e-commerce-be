@@ -14,6 +14,7 @@ import { logger } from './utils/logger';
 import baseRoutes from './routes/index';
 import userRoutes from './routes/user.routes';
 import authenticationRoutes from './routes/user/authentication.routes';
+import tokenRoutes from './routes/user/token.routes';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
 app.use('/', baseRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authenticationRoutes);
+app.use('/api/v1/tokens', tokenRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {
