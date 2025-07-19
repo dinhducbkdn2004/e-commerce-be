@@ -10,7 +10,7 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri);
   
   // Import models to ensure they are registered
-  await import('../models/User');
+  await import('../models/user.model');
 });
 
 afterAll(async () => {

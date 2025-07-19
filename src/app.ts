@@ -4,8 +4,8 @@ import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import { specs } from './docs/swagger';
-import { corsMiddleware } from './middlewares/corsMiddleware';
-import { rateLimitMiddleware } from './middlewares/rateLimitMiddleware';
+import { corsMiddleware } from './middlewares/cors';
+import { rateLimitMiddleware } from './middlewares/rateLimit';
 import { morganMiddleware } from './utils/morganConfig';
 import { errorHandler } from './middlewares/errorHandler';
 import { logger } from './utils/logger';
@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Body parsing middleware
 
 // Swagger API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
   explorer: true, // Cho phép khám phá schema
   customSiteTitle: 'E-Commerce API Documentation', // Chỉ tùy chỉnh tiêu đề trang
   swaggerOptions: {

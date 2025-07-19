@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { User } from '../models/user.model';
 import { CreateUserDTO } from '../dtos/user.dto';
 
 export class UserRepository {

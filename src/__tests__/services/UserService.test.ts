@@ -1,5 +1,5 @@
-import { UserService } from '../../services/UserService';
-import { UserRepository } from '../../repositories/UserRepository';
+import { UserService } from '../../services/user.service';
+import { UserRepository } from '../../repositories/user.repositories';
 import { CreateUserDTO } from '../../dtos/user.dto';
 import { AppError } from '../../middlewares/errorHandler';
 import bcrypt from 'bcrypt';

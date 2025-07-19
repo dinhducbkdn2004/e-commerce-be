@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserRepository } from '../repositories/UserRepository';
+import { UserRepository } from '../repositories/user.repositories';
 import { CreateUserDTO } from '../dtos/user.dto';
 import { AppError } from '../middlewares/errorHandler';
 import { logger } from '../utils/logger';

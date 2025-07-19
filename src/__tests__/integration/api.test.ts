@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../../app';
-import { User } from '../../models/User';
+import { User } from '../../models/user.model';
 
 describe('User API Integration Tests', () => {
   describe('POST /api/v1/users', () => {

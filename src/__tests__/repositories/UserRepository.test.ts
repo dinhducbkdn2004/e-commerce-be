@@ -1,6 +1,6 @@
-import { UserRepository } from '../../repositories/UserRepository';
+import { UserRepository } from '../../repositories/user.repositories';
 import { CreateUserDTO } from '../../dtos/user.dto';
-import { User } from '../../models/User';
+import { User } from '../../models/user.model';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;

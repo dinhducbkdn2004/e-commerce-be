@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthController } from '../../controllers/AuthController';
-import { UserService } from '../../services/UserService';
+import { AuthController } from '../../controllers/auth.controller';
+import { UserService } from '../../services/user.service';
 import { AppError } from '../../middlewares/errorHandler';
 import { Types } from 'mongoose';
 
