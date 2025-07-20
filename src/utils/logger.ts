@@ -12,7 +12,7 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// Custom format for file logging
+
 const fileFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.errors({ stack: true }),
