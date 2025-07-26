@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
+import { ApiResponse, ErrorMessages, Messages } from '../utils/responseHelper';
 
 export class AppError extends Error {
   constructor(
@@ -30,45 +31,45 @@ export const errorHandler = (
     statusCode: err.statusCode || 500
   });
 
-  // Handle different error types
-  if (err.name === 'ValidationError') {
-    res.status(400).json({
-      status: 'error',
-      message: 'Validation Error',
-      details: err.details
-    });
-    return;
-  }
-
-  if (err.name === 'MongoServerError' && err.code === 11000) {
-    res.status(409).json({
-      status: 'error',
-      message: 'Duplicate entry',
-      field: Object.keys(err.keyValue)[0]
-    });
-    return;
-  }
-
   const status = err.statusCode || 500;
-  const message = err.isOperational ? err.message : 'Internal Server Error';
+  let messageEn = err.message;
+  let messageVi = err.message;
 
-  // Response structure
-  const errorResponse: any = {
-    status: 'error',
-    message
+  // Get bilingual messages for known errors
+  if (ErrorMessages[err.message as keyof typeof ErrorMessages]) {
+    const errorMsg = ErrorMessages[err.message as keyof typeof ErrorMessages];
+    messageEn = errorMsg.en;
+    messageVi = errorMsg.vi;
+  } else {
+    // Handle different error types
+    if (err.name === 'ValidationError') {
+      messageEn = Messages.COMMON.INPUT_VALIDATION_ERROR.en;
+      messageVi = Messages.COMMON.INPUT_VALIDATION_ERROR.vi;
+    } else if (err.name === 'MongoServerError' && err.code === 11000) {
+      messageEn = Messages.COMMON.DUPLICATE_ENTRY.en;
+      messageVi = Messages.COMMON.DUPLICATE_ENTRY.vi;
+    } else if (!err.isOperational) {
+      messageEn = Messages.COMMON.INTERNAL_ERROR.en;
+      messageVi = Messages.COMMON.INTERNAL_ERROR.vi;
+    }
+  }
+
+  // Create standardized error response
+  const errorResponse: ApiResponse = {
+    success: false,
+    message: messageEn,
+    messageVi: messageVi,
+    timestamp: new Date().toISOString()
   };
 
-  // Chỉ thêm stack trace trong development và chỉ cho internal server errors
-  // Không show stack cho authentication/authorization errors vì lý do security
-  if (process.env.NODE_ENV === 'development' && 
-      status === 500 && 
-      !err.isOperational) {
-    errorResponse.stack = err.stack;
-  }
-
-  // Thêm error code cho development để dễ debug
+  // Add additional info for development
   if (process.env.NODE_ENV === 'development') {
-    errorResponse.errorCode = err.name || 'UnknownError';
+    errorResponse.error = err.name || 'UnknownError';
+    
+    // Only add stack trace for internal server errors for security
+    if (status === 500 && !err.isOperational) {
+      errorResponse.path = req.path;
+    }
   }
 
   res.status(status).json(errorResponse);
