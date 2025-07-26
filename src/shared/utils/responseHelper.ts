@@ -179,7 +179,7 @@ export const Messages = {
       en: 'An error occurred',
       vi: 'Đã xảy ra lỗi'
     },
-    VALIDATION_ERROR: {
+    INPUT_VALIDATION_ERROR: {
       en: 'Invalid request data',
       vi: 'Dữ liệu không hợp lệ'
     },
@@ -194,6 +194,38 @@ export const Messages = {
     NOT_FOUND: {
       en: 'Resource not found',
       vi: 'Không tìm thấy dữ liệu'
+    },
+    VALIDATION_ERROR: {
+      en: 'Validation failed',
+      vi: 'Lỗi xác thực dữ liệu'
+    },
+    DUPLICATE_ENTRY: {
+      en: 'Data already exists',
+      vi: 'Dữ liệu đã tồn tại'
+    },
+    INTERNAL_ERROR: {
+      en: 'Internal server error',
+      vi: 'Lỗi hệ thống'
     }
+  }
+};
+
+// Error message mapping
+export const ErrorMessages = {
+  'Email hoặc mật khẩu không đúng': {
+    en: 'Invalid email or password',
+    vi: 'Email hoặc mật khẩu không đúng'
+  },
+  'Email đã tồn tại': {
+    en: 'Email already exists', 
+    vi: 'Email đã tồn tại'
+  },
+  'Không tìm thấy người dùng': {
+    en: 'User not found',
+    vi: 'Không tìm thấy người dùng'
+  },
+  'Tài khoản bị khóa do đăng nhập sai quá nhiều lần': {
+    en: 'Account locked due to too many failed attempts',
+    vi: 'Tài khoản bị khóa do đăng nhập sai quá nhiều lần'
   }
 }; 
