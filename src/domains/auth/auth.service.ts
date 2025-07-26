@@ -17,7 +17,7 @@ export class AuthService {
       // Check if user already exists
       const existingUser = await this.authRepo.findByEmail(userData.email);
       if (existingUser) {
-        throw new AppError('User already exists with this email', 409);
+        throw new AppError('Email đã tồn tại', 409);
       }
 
       // Hash password
@@ -63,7 +63,7 @@ export class AuthService {
           ip: req.ip,
           userAgent: req.get('user-agent')
         });
-        throw new AppError('Invalid credentials', 401);
+        throw new AppError('Email hoặc mật khẩu không đúng', 401);
       }
 
       // Check if account is locked
@@ -85,7 +85,7 @@ export class AuthService {
           failedAttempts: user.failedAttempts + 1
         });
         
-        throw new AppError('Invalid credentials', 401);
+        throw new AppError('Email hoặc mật khẩu không đúng', 401);
       }
 
       // Reset failed attempts on successful login

@@ -1,406 +1,280 @@
-# E-Commerce Backend API
+# 🛍️ E-Commerce Backend API
 
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7.x-green.svg)](https://www.mongodb.com/)
-[![Express](https://img.shields.io/badge/Express-5.x-black.svg)](https://expressjs.com/)
-[![Jest](https://img.shields.io/badge/Jest-30.x-red.svg)](https://jestjs.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Một REST API hiện đại cho hệ thống thương mại điện tử được xây dựng với **Domain-Driven Design** pattern, sử dụng Node.js, Express, TypeScript, và MongoDB.
 
-A comprehensive e-commerce backend API built with Node.js, TypeScript, Express, and MongoDB following clean architecture principles. This project provides all the necessary backend services for a modern e-commerce platform including user management, product catalog, shopping cart, orders, wishlist, and more.
+## ✨ Tính năng chính
 
-## 🚀 Features
+- 🏗️ **Domain-Driven Architecture** - Cấu trúc rõ ràng, dễ mở rộng
+- 🔐 **Authentication & Authorization** - JWT, Google OAuth, Email verification
+- 👤 **User Management** - Profile management, Admin functions
+- 🌍 **Đa ngôn ngữ** - Response message tiếng Anh và tiếng Việt
+- 📝 **API Documentation** - Swagger UI tích hợp
+- 🛡️ **Security** - Helmet, CORS, Rate limiting, CSRF protection
+- 📊 **Logging & Monitoring** - Winston logger, Morgan middleware
+- 🔄 **Redis Caching** - Session management và caching
+- ✅ **Validation** - Joi schema validation
+- 🧪 **Testing** - Jest test framework
 
-- **Clean Architecture** - Separation of concerns with layered architecture
-- **TypeScript** - Type safety and better developer experience
-- **Authentication & Authorization** - JWT-based auth with role-based access
-- **User Management** - Registration, profile management, addresses
-- **Shopping Cart** - Add, update, remove items with persistence
-- **Order Processing** - Create, track, and manage orders
-- **Wishlist** - Save products for later
-- **Loyalty Program** - Points system and vouchers
-- **Comprehensive Logging** - Winston logger with Morgan HTTP logging
-- **Security** - Helmet, CORS, Rate limiting, and input validation
-- **Testing** - Unit tests, integration tests, and test coverage
-- **API Documentation** - Swagger/OpenAPI documentation
-- **Error Handling** - Centralized error handling with proper responses
+## 🎯 Cấu trúc dự án
 
-## 📋 Table of Contents
+```
+src/
+├── domains/                 # Domain-driven design
+│   ├── auth/               # 🔐 Authentication domain
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.repository.ts
+│   │   ├── auth.routes.ts
+│   │   └── index.ts
+│   └── user/               # 👤 User management domain
+│       ├── user.controller.ts
+│       ├── user.service.ts
+│       ├── user.repository.ts
+│       ├── user.routes.ts
+│       └── index.ts
+├── shared/                 # Shared utilities
+│   ├── middlewares/        # Express middlewares
+│   ├── utils/             # Helper utilities
+│   ├── config/            # Configuration
+│   ├── types/             # TypeScript types
+│   └── validators/        # Joi schemas
+├── models/                # MongoDB models
+├── dtos/                  # Data transfer objects
+├── docs/                  # API documentation
+└── routes/               # Main route aggregator
+```
 
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+## 🚀 Khởi động nhanh
 
-## 🛠️ Installation
+### 📋 Yêu cầu hệ thống
 
-### Prerequisites
+- Node.js >= 16.x
+- MongoDB >= 4.x
+- Redis >= 6.x
+- npm hoặc yarn
 
-- Node.js (v20.x or higher)
-- MongoDB (v7.x or higher)
-- npm or yarn
+### ⚙️ Cài đặt
 
-### Clone the repository
+1. **Clone repository**
 
 ```bash
-git clone https://github.com/your-username/e-commerce-be.git
+git clone <repository-url>
 cd e-commerce-be
 ```
 
-### Install dependencies
+2. **Cài đặt dependencies**
 
 ```bash
 npm install
 ```
 
-### Set up environment variables
+3. **Thiết lập environment variables**
 
 ```bash
 cp .env.example .env
+# Chỉnh sửa file .env với thông tin của bạn
 ```
 
-Edit `.env` with your configuration values.
+4. **Khởi động Redis** (xem [REDIS_SETUP.md](./REDIS_SETUP.md))
 
-## 🔧 Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
+5. **Chạy ứng dụng**
 
 ```bash
-# Database
-MONGO_URI=mongodb://localhost:27017/mybackend
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key
-JWT_EXPIRES_IN=1h
-JWT_EXPIRES_IN_REFRESH=7d
-
-# Server
-PORT=3000
-NODE_ENV=development
-
-# Security
-BCRYPT_ROUNDS=12
-RATE_LIMIT_REQUESTS=100
-
-# CORS
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
-
-# Logging
-LOG_LEVEL=info
-```
-
-## 🚀 Usage
-
-### Development
-
-```bash
-# Start in development mode with hot reload
+# Development
 npm run dev
 
-# Start in development mode (alternative)
-npm run start:dev
-```
-
-### Production
-
-```bash
-# Build the project
+# Production
 npm run build
-
-# Start production server
 npm start
 ```
 
-### Other Commands
+### 🌐 API Endpoints
 
-```bash
-# Run tests
-npm test
+#### 🔐 Authentication (`/api/v1/auth`)
 
-# Run tests with coverage
-npm run test:coverage
+| Method | Endpoint           | Mô tả             | Response VI                                            |
+| ------ | ------------------ | ----------------- | ------------------------------------------------------ |
+| POST   | `/register`        | Đăng ký tài khoản | "Đăng ký thành công. Vui lòng xác thực email của bạn." |
+| POST   | `/login`           | Đăng nhập         | "Đăng nhập thành công. Chào mừng bạn trở lại!"         |
+| POST   | `/google`          | Đăng nhập Google  | "Đăng nhập Google thành công"                          |
+| POST   | `/refresh-token`   | Làm mới token     | "Làm mới token thành công"                             |
+| POST   | `/logout`          | Đăng xuất         | "Đăng xuất thành công. Hẹn gặp lại bạn!"               |
+| POST   | `/verify-email`    | Xác thực email    | "Xác thực email thành công"                            |
+| POST   | `/forgot-password` | Quên mật khẩu     | "Email đặt lại mật khẩu đã được gửi"                   |
+| POST   | `/reset-password`  | Đặt lại mật khẩu  | "Đặt lại mật khẩu thành công"                          |
 
-# Run tests in watch mode
-npm run test:watch
+#### 👤 User Management (`/api/v1/users`)
 
-# Lint code
-npm run lint
+| Method | Endpoint   | Mô tả                            | Response VI                           |
+| ------ | ---------- | -------------------------------- | ------------------------------------- |
+| GET    | `/profile` | Lấy thông tin cá nhân            | "Lấy thông tin hồ sơ thành công"      |
+| PUT    | `/profile` | Cập nhật thông tin cá nhân       | "Cập nhật hồ sơ thành công"           |
+| GET    | `/`        | Lấy danh sách người dùng (Admin) | "Lấy danh sách người dùng thành công" |
+| GET    | `/:id`     | Lấy thông tin người dùng (Admin) | "Lấy thông tin hồ sơ thành công"      |
+| PUT    | `/:id`     | Cập nhật người dùng (Admin)      | "Cập nhật người dùng thành công"      |
+| DELETE | `/:id`     | Xóa người dùng (Admin)           | "Xóa người dùng thành công"           |
 
-# Format code
-npm run format
-```
+### 📊 API Response Format
 
-## 📚 API Endpoints
-
-### Base URL
-
-```
-http://localhost:3000
-```
-
-### Authentication
-
-All protected routes require a JWT token in the Authorization header:
-
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-### Endpoints
-
-#### **General**
-
-- `GET /` - API information
-- `GET /health` - Health check
-
-#### **Authentication**
-
-- `POST /api/v1/users` - Register a new user
-- `POST /api/v1/users/login` - Login user
-
-### Request/Response Examples
-
-#### Register User
-
-```bash
-POST /api/v1/users
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "password": "securePassword123",
-  "role": "user"
-}
-```
-
-**Response:**
+Tất cả API đều trả về format chuẩn với message đa ngôn ngữ:
 
 ```json
 {
-  "status": "success",
+  "success": true,
+  "message": "Operation successful",
+  "messageVi": "Thao tác thành công",
   "data": {
-    "_id": "60f7b3b3e6b3a12345678901",
-    "username": "john_doe",
-    "role": "user",
-    "createdAt": "2025-07-06T10:30:00.000Z",
-    "updatedAt": "2025-07-06T10:30:00.000Z"
-  }
+    // Response data here
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-#### Login User
-
-```bash
-POST /api/v1/users/login
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "password": "securePassword123"
-}
-```
-
-**Response:**
+**Error Response:**
 
 ```json
 {
-  "status": "success",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": "60f7b3b3e6b3a12345678901",
-      "username": "john_doe",
-      "role": "user"
-    }
-  }
+  "success": false,
+  "message": "An error occurred",
+  "messageVi": "Đã xảy ra lỗi",
+  "error": "Detailed error message",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+## 📖 API Documentation
+
+Truy cập Swagger UI tại: `http://localhost:3000/docs`
+
+- 🔍 **Interactive testing** - Test API trực tiếp
+- 📋 **Schema documentation** - Chi tiết request/response
+- 🏷️ **Organized by domains** - Authentication, Users
+
+## 🛡️ Security Features
+
+- **JWT Authentication** - Access & refresh tokens
+- **Password Security** - Bcrypt hashing, account locking
+- **Rate Limiting** - Prevent brute force attacks
+- **CORS Protection** - Cross-origin resource sharing
+- **Helmet Security** - Security headers
+- **CSRF Protection** - Cross-site request forgery
+- **Input Validation** - Joi schema validation
+- **SQL Injection Protection** - MongoDB ODM
+
+## 🗄️ Database Schema
+
+### User Model
+
+```javascript
+{
+  name: String,
+  email: String (unique),
+  password: String (hashed),
+  role: ['user', 'admin'],
+  isEmailVerified: Boolean,
+  isActive: Boolean,
+  googleId: String (optional),
+  avatar: String (optional),
+  phoneNumber: String (optional),
+  refreshTokens: [RefreshToken],
+  failedAttempts: Number,
+  lockUntil: Date,
+  // ... other fields
 }
 ```
 
 ## 🧪 Testing
 
-This project includes comprehensive test coverage:
-
-### Running Tests
-
 ```bash
-# Run all tests
+# Chạy tất cả tests
 npm test
 
-# Run tests with coverage
+# Test với coverage
 npm run test:coverage
 
-# Run tests in watch mode
+# Test watch mode
 npm run test:watch
-
-# Run specific test file
-npm test -- UserService.test.ts
 ```
 
-### Test Types
+## 🔧 Environment Variables
 
-- **Unit Tests** - Testing individual components (services, repositories, controllers)
-- **Integration Tests** - Testing API endpoints end-to-end
-- **Test Coverage** - Minimum 70% coverage required
+```env
+# Server
+PORT=3000
+NODE_ENV=development
 
-### Test Structure
+# Database
+MONGODB_URI=mongodb://localhost:27017/ecommerce
 
-```
-src/__tests__/
-├── setup.ts                 # Test configuration
-├── controllers/              # Controller tests
-├── services/                 # Service tests
-├── repositories/             # Repository tests
-└── integration/              # Integration tests
-```
+# JWT
+JWT_SECRET=your-jwt-secret
+JWT_REFRESH_SECRET=your-refresh-secret
 
-## 📁 Project Structure
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
 
-```
-my-backend/
-├── src/
-│   ├── __tests__/           # Test files
-│   ├── config/              # Configuration files
-│   ├── controllers/         # Request handlers
-│   ├── dtos/                # Data Transfer Objects
-│   ├── middlewares/         # Custom middleware
-│   ├── models/              # Database models
-│   ├── repositories/        # Data access layer
-│   ├── routes/              # Route definitions
-│   ├── services/            # Business logic
-│   ├── utils/               # Utility functions
-│   ├── validators/          # Input validation
-│   ├── app.ts               # Express app setup
-│   └── server.ts            # Server entry point
-├── logs/                    # Log files
-├── dist/                    # Compiled JavaScript
-├── coverage/                # Test coverage reports
-├── .env                     # Environment variables
-├── .eslintrc.json           # ESLint configuration
-├── .prettierrc.json         # Prettier configuration
-├── jest.config.js           # Jest configuration
-├── tsconfig.json            # TypeScript configuration
-└── package.json             # Project dependencies
+# Email (optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
 ```
 
-## 🏗️ Architecture
+## 📝 Scripts
 
-This project follows **Clean Architecture** principles:
-
-### Layers
-
-1. **Controllers** - Handle HTTP requests and responses
-2. **Services** - Contains business logic
-3. **Repositories** - Data access layer
-4. **Models** - Database entities
-5. **Middlewares** - Cross-cutting concerns
-
-### Data Flow
-
+```bash
+npm run dev          # Chạy development server
+npm run build        # Build TypeScript to JavaScript
+npm start            # Chạy production server
+npm test             # Chạy tests
+npm run lint         # Lint code
+npm run format       # Format code với Prettier
 ```
-Request → Controller → Service → Repository → Database
-Response ← Controller ← Service ← Repository ← Database
-```
-
-## 🏗️ Project Structure
-
-```
-e-commerce-be/
-├── src/                 # Source code
-│   ├── config/          # Application configuration
-│   ├── controllers/     # Request handlers
-│   │   └── user/        # User-related controllers
-│   ├── docs/            # API documentation
-│   ├── dtos/            # Data Transfer Objects
-│   ├── middlewares/     # Express middlewares
-│   ├── models/          # Mongoose models
-│   ├── repositories/    # Data access layer
-│   │   └── user/        # User-related repositories
-│   ├── routes/          # API routes
-│   │   └── user/        # User-related routes
-│   ├── services/        # Business logic
-│   │   └── user/        # User-related services
-│   ├── utils/           # Utility functions
-│   ├── validators/      # Input validation schemas
-│   ├── app.ts           # Express app setup
-│   └── server.ts        # Server entry point
-├── logs/                # Application logs
-├── scripts/             # Utility scripts
-├── __tests__/           # Test files
-│   ├── integration/     # Integration tests
-│   ├── controllers/     # Controller tests
-│   ├── services/        # Service tests
-│   └── repositories/    # Repository tests
-├── jest.config.js       # Jest configuration
-├── tsconfig.json        # TypeScript configuration
-└── package.json         # Project dependencies
-```
-
-The project follows a clean architecture pattern with clear separation of concerns:
-
-1. **Models**: Database schemas and interfaces
-2. **DTOs**: Data transfer objects for API requests/responses
-3. **Repositories**: Data access layer that interacts with the database
-4. **Services**: Business logic layer
-5. **Controllers**: Handle HTTP requests and responses
-6. **Routes**: Define API endpoints
-7. **Middlewares**: Handle cross-cutting concerns like auth, validation, etc.
-8. **Utils**: Shared utility functions
-9. **Config**: Application configuration
-
-## 🛡️ Security Features
-
-- **Helmet** - Security headers
-- **CORS** - Cross-origin resource sharing
-- **Rate Limiting** - Prevent abuse
-- **Input Validation** - Joi validation
-- **Password Hashing** - bcrypt with salt rounds
-- **JWT Authentication** - Secure token-based auth
-
-## 📊 Logging
-
-- **Winston** - Structured logging
-- **Morgan** - HTTP request logging
-- **Log Levels** - info, warn, error, debug
-- **Log Files** - Separate files for different log levels
-
-## 🔄 Development Workflow
-
-1. **Code** - Write your feature/fix
-2. **Test** - Run tests to ensure quality
-3. **Lint** - Check code style with ESLint
-4. **Format** - Auto-format with Prettier
-5. **Commit** - Commit your changes
-6. **Deploy** - Deploy to your environment
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Fork repository
+2. Tạo feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Tạo Pull Request
 
-### Code Style
+## 📚 Tài liệu kỹ thuật
 
-- Follow TypeScript best practices
-- Use ESLint and Prettier configurations
-- Write comprehensive tests
-- Follow conventional commit messages
+### Architecture Principles
+
+- **Domain-Driven Design** - Tách biệt logic theo domains
+- **Clean Architecture** - Separation of concerns
+- **SOLID Principles** - Maintainable và extensible code
+- **Repository Pattern** - Data access abstraction
+- **Service Layer Pattern** - Business logic encapsulation
+
+### Performance
+
+- **Redis Caching** - Session và data caching
+- **Database Indexing** - Optimized queries
+- **Connection Pooling** - Efficient database connections
+- **Compression** - Gzip response compression
+
+### Monitoring & Logging
+
+- **Winston Logger** - Structured logging
+- **Morgan Middleware** - HTTP request logging
+- **Error Tracking** - Comprehensive error handling
+- **Performance Metrics** - Request timing và monitoring
+
+## 🔗 Links
+
+- [API Documentation](http://localhost:3000/docs) - Swagger UI
+- [Health Check](http://localhost:3000/health) - API status
+- [Redis Setup Guide](./REDIS_SETUP.md) - Redis configuration
 
 ## 📄 License
 
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Express.js team for the excellent framework
-- MongoDB team for the database
-- All contributors and the open-source community
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Made with ❤️ by Dinh Duc**
+**Built with ❤️ using TypeScript, Express, MongoDB, và Redis**
