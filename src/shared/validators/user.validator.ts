@@ -80,3 +80,15 @@ export const revokeTokenSchema = Joi.object({
         'any.required': 'Refresh token is required'
     })
 });
+
+// Google authentication
+export const googleAuthSchema = Joi.object({
+    idToken: Joi.string().required(),
+    user: Joi.object({
+        uid: Joi.string().required(),
+        email: Joi.string().email().required(),
+        displayName: Joi.string().allow(null),
+        photoURL: Joi.string().uri().allow(null),
+        emailVerified: Joi.boolean().default(false)
+    }).required()
+});

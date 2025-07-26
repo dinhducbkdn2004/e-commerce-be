@@ -1,35 +1,25 @@
 import { Router } from 'express';
-import { config } from '../config';
-import { logger } from '../utils/logger';
+import authRoutes from '../domains/auth/auth.routes';
+import userRoutes from '../domains/user/user.routes';
+// import cartRoutes from '../domains/cart/cart.routes';
+// import orderRoutes from '../domains/order/order.routes';
+// import addressRoutes from '../domains/address/address.routes';
 
 const router = Router();
 
-// Root route
-router.get('/', (req, res) => {
-  logger.info('📍 Root endpoint accessed');
-  res.json({ 
-    message: 'Welcome to My Backend API',
-    version: '1.0.0',
-    docs: '/api/v1/docs',
-    health: '/health',
-    endpoints: {
-      users: '/api/v1/users',
-      login: '/api/v1/users/login',
-      tokens: '/api/v1/tokens',
-      logout: '/api/v1/logout'
-    }
-  });
-});
+// API v1 routes with domain-based structure
+router.use('/api/v1/auth', authRoutes);
+router.use('/api/v1/users', userRoutes);
+// router.use('/api/v1/cart', cartRoutes);
+// router.use('/api/v1/orders', orderRoutes);
+// router.use('/api/v1/address', addressRoutes);
 
 // Health check
 router.get('/health', (req, res) => {
-  logger.info('💚 Health check endpoint accessed');
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
-    environment: config.NODE_ENV
+  res.status(200).json({
+    status: 'success',
+    message: 'API is running',
+    timestamp: new Date().toISOString()
   });
 });
 
