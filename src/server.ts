@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import app from './app';
-import { config } from './config';
-import { logger } from './utils/logger';
+import { config } from './shared/config';
+import { logger } from './shared/utils/logger';
 
 // Connect to MongoDB
 mongoose.connect(config.MONGO_URI)

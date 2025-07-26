@@ -21,8 +21,11 @@ export interface IUser extends mongoose.Document {
   role: 'user' | 'admin';
   isEmailVerified: boolean;
   emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
+  googleId?: string;
+  isActive: boolean;
   phoneNumber?: string;
   avatar?: string;
   addresses: IAddress[];
@@ -73,8 +76,11 @@ const UserSchema = new Schema<IUser>(
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
+    googleId: { type: String },
+    isActive: { type: Boolean, default: true },
     phoneNumber: { type: String },
     avatar: { type: String },
     addresses: [AddressSchema],

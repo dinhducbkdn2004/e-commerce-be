@@ -21,108 +21,95 @@
  *   schemas:
  *     RegisterRequest:
  *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: Full name of the user
- *           example: John Doe
- *         email:
- *           type: string
- *           format: email
- *           description: Email address (unique)
- *           example: john@example.com
- *         password:
- *           type: string
- *           format: password
- *           description: Password (min 8 chars)
- *           example: SecureP@ss123
- *         phoneNumber:
- *           type: string
- *           description: Phone number
- *           example: '+1234567890'
  *       required:
  *         - name
  *         - email
  *         - password
- *     
- *     LoginRequest:
- *       type: object
  *       properties:
+ *         name:
+ *           type: string
+ *           description: User full name
+ *           example: John Doe
  *         email:
  *           type: string
  *           format: email
- *           description: Email address
+ *           description: User email address
  *           example: john@example.com
  *         password:
  *           type: string
- *           format: password
- *           description: Password
- *           example: SecureP@ss123
+ *           minLength: 8
+ *           description: User password
+ *           example: password123
+ *         phoneNumber:
+ *           type: string
+ *           description: User phone number
+ *           example: "+1234567890"
+ *         role:
+ *           type: string
+ *           enum: [user, admin]
+ *           default: user
+ *           description: User role
+ * 
+ *     LoginRequest:
+ *       type: object
  *       required:
  *         - email
  *         - password
- *     
- *     EmailVerificationRequest:
- *       type: object
  *       properties:
  *         email:
  *           type: string
  *           format: email
- *           description: Email address to verify
+ *           description: User email address
  *           example: john@example.com
- *         token:
+ *         password:
  *           type: string
- *           description: Verification token sent to email
- *           example: a1b2c3d4e5f6g7h8i9j0
- *       required:
- *         - email
- *         - token
- *     
- *     PasswordResetRequest:
+ *           description: User password
+ *           example: password123
+ * 
+ *     GoogleAuthRequest:
  *       type: object
- *       properties:
- *         email:
- *           type: string
- *           format: email
- *           description: Email address
- *           example: john@example.com
  *       required:
- *         - email
- *     
- *     PasswordResetConfirmRequest:
- *       type: object
+ *         - idToken
+ *         - user
  *       properties:
- *         email:
+ *         idToken:
  *           type: string
- *           format: email
- *           description: Email address
- *           example: john@example.com
- *         token:
- *           type: string
- *           description: Password reset token
- *           example: a1b2c3d4e5f6g7h8i9j0
- *         newPassword:
- *           type: string
- *           format: password
- *           description: New password (min 8 chars)
- *           example: NewSecureP@ss123
- *       required:
- *         - email
- *         - token
- *         - newPassword
- *     
+ *           description: Google ID token
+ *         user:
+ *           type: object
+ *           required:
+ *             - uid
+ *             - email
+ *           properties:
+ *             uid:
+ *               type: string
+ *               description: Google user ID
+ *             email:
+ *               type: string
+ *               format: email
+ *               description: User email from Google
+ *             displayName:
+ *               type: string
+ *               description: User display name from Google
+ *             photoURL:
+ *               type: string
+ *               description: User photo URL from Google
+ *             emailVerified:
+ *               type: boolean
+ *               description: Whether email is verified in Google
+ * 
  *     AuthResponse:
  *       type: object
  *       properties:
  *         status:
  *           type: string
  *           example: success
+ *         message:
+ *           type: string
+ *           example: Login successful
  *         data:
  *           type: object
  *           properties:
- *             token:
- *               type: string
- *               description: JWT authentication token
  *             user:
  *               type: object
  *               properties:
@@ -134,21 +121,61 @@
  *                   type: string
  *                 role:
  *                   type: string
- *                 isEmailVerified:
- *                   type: boolean
- *     
- *     Error:
+ *             accessToken:
+ *               type: string
+ *               description: JWT access token
+ *             refreshToken:
+ *               type: string
+ *               description: JWT refresh token
+ *             tokenType:
+ *               type: string
+ *               example: Bearer
+ *             expiresIn:
+ *               type: number
+ *               example: 900
+ *               description: Token expiration time in seconds
+ * 
+ *     RefreshTokenRequest:
  *       type: object
+ *       required:
+ *         - refreshToken
  *       properties:
- *         status:
+ *         refreshToken:
  *           type: string
- *           example: error
- *         message:
+ *           description: Refresh token
+ * 
+ *     VerifyEmailRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *       properties:
+ *         token:
  *           type: string
- *           description: Error message
- *         stack:
+ *           description: Email verification token
+ * 
+ *     ForgotPasswordRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
  *           type: string
- *           description: Error stack trace (only in development)
+ *           format: email
+ *           description: User email address
+ * 
+ *     ResetPasswordRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *         - password
+ *       properties:
+ *         token:
+ *           type: string
+ *           description: Password reset token
+ *         password:
+ *           type: string
+ *           minLength: 8
+ *           description: New password
  */
 
 /**
@@ -169,32 +196,42 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AuthResponse'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User registered successfully. Please verify your email.
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                     emailVerificationToken:
+ *                       type: string
+ *                       description: Email verification token (dev only)
  *       400:
- *         description: Bad request - Invalid input data
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Invalid input data
  *       409:
- *         description: Conflict - Email already exists
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: User already exists
  */
 
 /**
  * @swagger
  * /api/v1/auth/login:
  *   post:
- *     summary: Login user and get authentication token
+ *     summary: Login user
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -209,24 +246,102 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         description: Invalid credentials
+ *       423:
+ *         description: Account locked
+ */
+
+/**
+ * @swagger
+ * /api/v1/auth/google:
+ *   post:
+ *     summary: Google authentication
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/GoogleAuthRequest'
+ *     responses:
+ *       200:
+ *         description: Google authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Bad request - Invalid credentials
+ *         description: Invalid Google token
+ *       401:
+ *         description: Authentication failed
+ */
+
+/**
+ * @swagger
+ * /api/v1/auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RefreshTokenRequest'
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: Not found - User not found
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Token refreshed successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                     tokenType:
+ *                       type: string
+ *                       example: Bearer
+ *                     expiresIn:
+ *                       type: number
+ *                       example: 900
+ *       401:
+ *         description: Invalid refresh token
+ */
+
+/**
+ * @swagger
+ * /api/v1/auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful
+ *       401:
+ *         description: Unauthorized
  */
 
 /**
@@ -240,7 +355,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/EmailVerificationRequest'
+ *             $ref: '#/components/schemas/VerifyEmailRequest'
  *     responses:
  *       200:
  *         description: Email verified successfully
@@ -255,70 +370,8 @@
  *                 message:
  *                   type: string
  *                   example: Email verified successfully
- *                 data:
- *                   type: object
- *                   properties:
- *                     isVerified:
- *                       type: boolean
- *                       example: true
  *       400:
- *         description: Bad request - Invalid token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       404:
- *         description: Not found - User not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
-
-/**
- * @swagger
- * /api/v1/auth/resend-verification:
- *   post:
- *     summary: Resend email verification token
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/PasswordResetRequest'
- *     responses:
- *       200:
- *         description: Verification email sent if account exists
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 message:
- *                   type: string
- *                   example: Verification email sent
- *       404:
- *         description: Not found - User not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Invalid or expired token
  */
 
 /**
@@ -332,10 +385,10 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/PasswordResetRequest'
+ *             $ref: '#/components/schemas/ForgotPasswordRequest'
  *     responses:
  *       200:
- *         description: Password reset instructions sent if account exists
+ *         description: Password reset email sent
  *         content:
  *           application/json:
  *             schema:
@@ -346,27 +399,21 @@
  *                   example: success
  *                 message:
  *                   type: string
- *                   example: If the email exists, a reset link has been sent
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *                   example: Password reset email sent
  */
 
 /**
  * @swagger
  * /api/v1/auth/reset-password:
  *   post:
- *     summary: Reset password with token
+ *     summary: Reset password
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/PasswordResetConfirmRequest'
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
  *     responses:
  *       200:
  *         description: Password reset successfully
@@ -382,15 +429,5 @@
  *                   type: string
  *                   example: Password reset successfully
  *       400:
- *         description: Bad request - Invalid or expired token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Invalid or expired token
  */

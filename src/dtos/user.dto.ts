@@ -8,6 +8,10 @@ export interface CreateUserDTO {
     phoneNumber?: string;
     avatar?: string;
     emailVerificationToken?: string;
+    emailVerificationExpires?: Date;
+    isEmailVerified?: boolean;
+    googleId?: string;
+    isActive?: boolean;
 }
 
 export interface UpdateUserDTO {
@@ -16,6 +20,7 @@ export interface UpdateUserDTO {
     password?: string;
     phoneNumber?: string;
     avatar?: string;
+    isActive?: boolean;
 }
 
 export interface AddressDTO {

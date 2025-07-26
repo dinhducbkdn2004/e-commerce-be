@@ -5,22 +5,18 @@ import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import { specs } from './docs/swagger';
-import { corsMiddleware } from './middlewares/corsMiddleware';
-import { rateLimitMiddleware } from './middlewares/rateLimitMiddleware';
-import { morganMiddleware } from './utils/morganConfig';
-import { errorHandler } from './middlewares/errorHandler';
-import { logger } from './utils/logger';
-import { sessionConfig } from './middlewares/sessionMiddleware';
-import { attachCSRFToken } from './middlewares/csrfProtection';
-import { checkTokenBlacklist } from './middlewares/tokenBlacklist';
-import { redisClient } from './utils/redis';
+import { corsMiddleware } from './shared/middlewares/corsMiddleware';
+import { rateLimitMiddleware } from './shared/middlewares/rateLimitMiddleware';
+import { morganMiddleware } from './shared/utils/morganConfig';
+import { errorHandler } from './shared/middlewares/errorHandler';
+import { logger } from './shared/utils/logger';
+import { sessionConfig } from './shared/middlewares/sessionMiddleware';
+import { attachCSRFToken } from './shared/middlewares/csrfProtection';
+import { checkTokenBlacklist } from './shared/middlewares/tokenBlacklist';
+import { redisClient } from './shared/utils/redis';
 
 // Routes
 import baseRoutes from './routes/index';
-import userRoutes from './routes/user.routes';
-import authenticationRoutes from './routes/user/authentication.routes';
-import tokenRoutes from './routes/user/token.routes';
-import logoutRoutes from './routes/user/logout.routes';
 
 const app = express();
 
@@ -70,10 +66,6 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
 
 // Routes
 app.use('/', baseRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/auth', authenticationRoutes);
-app.use('/api/v1/tokens', tokenRoutes);
-app.use('/api/v1/logout', logoutRoutes);
 
 // 404 handler for undefined routes
 app.use((req, res) => {
