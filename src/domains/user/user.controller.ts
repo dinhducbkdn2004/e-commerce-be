@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { logger } from '../../shared/utils/logger';
+import { ResponseHelper, Messages } from '../../shared/utils/responseHelper';
 
 export class UserController {
   private userService = new UserService();
 
-  async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const userId = req.user?.id;
       const user = await this.userService.getUserById(userId);
@@ -15,10 +16,7 @@ export class UserController {
         ip: req.ip
       });
 
-      res.json({
-        status: 'success',
-        data: { user }
-      });
+      return ResponseHelper.success(res, { user }, Messages.USER.PROFILE_RETRIEVED.en, Messages.USER.PROFILE_RETRIEVED.vi);
     } catch (error) {
       logger.error('Get user profile failed', {
         userId: req.user?.id,
@@ -29,7 +27,7 @@ export class UserController {
     }
   }
 
-  async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       logger.info('Get all users request received', {
         ip: req.ip,
@@ -43,10 +41,7 @@ export class UserController {
         statusCode: 200
       });
 
-      res.json({
-        status: 'success',
-        data: { users }
-      });
+      return ResponseHelper.success(res, { users }, Messages.USER.USERS_RETRIEVED.en, Messages.USER.USERS_RETRIEVED.vi);
     } catch (error) {
       logger.error('Get all users request failed', {
         ip: req.ip,
@@ -56,7 +51,7 @@ export class UserController {
     }
   }
 
-  async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getUserById(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { id } = req.params;
       logger.info('Get user by ID request received', {
@@ -71,10 +66,7 @@ export class UserController {
         statusCode: 200
       });
 
-      res.json({
-        status: 'success',
-        data: { user }
-      });
+      return ResponseHelper.success(res, { user }, Messages.USER.PROFILE_RETRIEVED.en, Messages.USER.PROFILE_RETRIEVED.vi);
     } catch (error) {
       logger.error('Get user by ID request failed', {
         targetUserId: req.params.id,
@@ -85,7 +77,7 @@ export class UserController {
     }
   }
 
-  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const userId = req.user?.id;
       logger.info('Update user profile request received', {
@@ -100,11 +92,7 @@ export class UserController {
         statusCode: 200
       });
 
-      res.json({
-        status: 'success',
-        message: 'Profile updated successfully',
-        data: { user: updatedUser }
-      });
+      return ResponseHelper.success(res, { user: updatedUser }, Messages.USER.PROFILE_UPDATED.en, Messages.USER.PROFILE_UPDATED.vi);
     } catch (error) {
       logger.error('Update user profile request failed', {
         userId: req.user?.id,
@@ -115,7 +103,7 @@ export class UserController {
     }
   }
 
-  async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async updateUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { id } = req.params;
       logger.info('Update user request received', {
@@ -131,11 +119,7 @@ export class UserController {
         statusCode: 200
       });
 
-      res.json({
-        status: 'success',
-        message: 'User updated successfully',
-        data: { user: updatedUser }
-      });
+      return ResponseHelper.success(res, { user: updatedUser }, Messages.USER.USER_UPDATED.en, Messages.USER.USER_UPDATED.vi);
     } catch (error) {
       logger.error('Update user request failed', {
         targetUserId: req.params.id,
@@ -147,7 +131,7 @@ export class UserController {
     }
   }
 
-  async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async deleteUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
       const { id } = req.params;
       logger.info('Delete user request received', {
@@ -163,10 +147,7 @@ export class UserController {
         statusCode: 200
       });
 
-      res.json({
-        status: 'success',
-        message: 'User deleted successfully'
-      });
+      return ResponseHelper.success(res, null, Messages.USER.USER_DELETED.en, Messages.USER.USER_DELETED.vi);
     } catch (error) {
       logger.error('Delete user request failed', {
         targetUserId: req.params.id,

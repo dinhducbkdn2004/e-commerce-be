@@ -17,8 +17,14 @@ router.use('/api/v1/users', userRoutes);
 // Health check
 router.get('/health', (req, res) => {
   res.status(200).json({
-    status: 'success',
-    message: 'API is running',
+    success: true,
+    message: 'API is running smoothly',
+    messageVi: 'API đang hoạt động tốt',
+    data: {
+      status: 'healthy',
+      uptime: process.uptime(),
+      version: '1.0.0'
+    },
     timestamp: new Date().toISOString()
   });
 });
