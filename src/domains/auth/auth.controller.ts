@@ -50,13 +50,25 @@ export class AuthController {
       const { email, password } = req.body;
       const result = await this.authService.login(email, password, req);
       
+      // 🔥 Set refresh token vào httpOnly cookie
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // chỉ HTTPS ở production
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+        path: '/'
+      });
+
       logger.info('Login successful', {
         userId: result.user._id,
         email: result.user.email,
         ip: req.ip
       });
 
-      return ResponseHelper.success(res, result, Messages.AUTH.LOGIN_SUCCESS.en, Messages.AUTH.LOGIN_SUCCESS.vi);
+      // 🔥 Không trả refresh token trong response body
+      const { refreshToken, ...responseData } = result;
+      
+      return ResponseHelper.success(res, responseData, Messages.AUTH.LOGIN_SUCCESS.en, Messages.AUTH.LOGIN_SUCCESS.vi);
     } catch (error) {
       logger.error('Login failed', {
         ip: req.ip,
@@ -72,13 +84,25 @@ export class AuthController {
       const { idToken, user } = req.body;
       const result = await this.authService.googleAuth(idToken, user, req);
       
+      // 🔥 Set refresh token vào httpOnly cookie
+      res.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/'
+      });
+
       logger.info('Google authentication successful', {
         userId: result.user._id,
         email: result.user.email,
         ip: req.ip
       });
 
-      return ResponseHelper.success(res, result, Messages.AUTH.GOOGLE_AUTH_SUCCESS.en, Messages.AUTH.GOOGLE_AUTH_SUCCESS.vi);
+      // 🔥 Không trả refresh token trong response body
+      const { refreshToken, ...responseData } = result;
+
+      return ResponseHelper.success(res, responseData, Messages.AUTH.GOOGLE_AUTH_SUCCESS.en, Messages.AUTH.GOOGLE_AUTH_SUCCESS.vi);
     } catch (error) {
       logger.error('Google authentication failed', {
         ip: req.ip,
@@ -92,6 +116,14 @@ export class AuthController {
     try {
       const userId = req.user?.id;
       await this.authService.logout(userId, req);
+      
+      // 🔥 Xóa refresh token cookie
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/'
+      });
       
       logger.info('Logout successful', {
         userId,
@@ -110,7 +142,13 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const { refreshToken } = req.body;
+      // 🔥 Đọc refresh token từ cookie thay vì request body
+      const refreshToken = req.cookies.refresh_token;
+      
+      if (!refreshToken) {
+        return ResponseHelper.unauthorized(res, 'Refresh token not found', 'Không tìm thấy refresh token');
+      }
+      
       const result = await this.authService.refreshToken(refreshToken);
       
       return ResponseHelper.success(res, result, Messages.AUTH.TOKEN_REFRESH_SUCCESS.en, Messages.AUTH.TOKEN_REFRESH_SUCCESS.vi);

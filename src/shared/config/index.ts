@@ -32,4 +32,13 @@ export const config = {
     
     // Logging
     LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+    
+    // 🔥 Cookie settings dựa trên environment
+    COOKIE_SETTINGS: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS only ở production
+      sameSite: 'strict' as const,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: '/'
+    }
 } as const;
