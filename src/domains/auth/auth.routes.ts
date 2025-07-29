@@ -9,7 +9,8 @@ import {
   passwordResetRequestSchema,
   passwordResetConfirmSchema,
   googleAuthSchema,
-  refreshTokenSchema
+  refreshTokenSchema,
+  resendVerificationEmailSchema
 } from '../../shared/validators/user.validator';
 
 const router = Router();
@@ -38,6 +39,9 @@ router.post('/forgot-password', validate(passwordResetRequestSchema),
 
 router.post('/reset-password', validate(passwordResetConfirmSchema), 
   authController.resetPassword.bind(authController));
+
+router.post('/resend-verification-email', validate(resendVerificationEmailSchema), 
+  authController.resendVerificationEmail.bind(authController));
 
 // Protected endpoints
 router.post('/logout', authenticate, 

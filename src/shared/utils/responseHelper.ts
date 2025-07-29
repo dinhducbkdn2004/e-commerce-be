@@ -142,6 +142,10 @@ export const Messages = {
     ACCOUNT_LOCKED: {
       en: 'Account locked due to too many failed attempts',
       vi: 'Tài khoản bị khóa do đăng nhập sai quá nhiều lần'
+    },
+    VERIFICATION_EMAIL_SENT: {
+      en: 'Verification email sent',
+      vi: 'Email xác thực đã được gửi'
     }
   },
   USER: {

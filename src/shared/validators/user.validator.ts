@@ -91,3 +91,7 @@ export const googleAuthSchema = Joi.object({
         emailVerified: Joi.boolean().default(false)
     }).required()
 });
+
+export const resendVerificationEmailSchema = Joi.object({
+    email: Joi.string().email().required()
+});
