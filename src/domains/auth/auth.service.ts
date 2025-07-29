@@ -8,6 +8,7 @@ import { AppError } from '../../shared/middlewares/errorHandler';
 import { logger } from '../../shared/utils/logger';
 import { config } from '../../shared/config';
 import { IUser } from '../../models/User';
+import { emailService } from '../../shared/services/emailService';
 
 export class AuthService {
   private authRepo = new AuthRepository();
@@ -40,6 +41,22 @@ export class AuthService {
         email: newUser.email
       });
 
+      // Send verification email
+      try {
+        await emailService.sendVerificationEmail(
+          newUser.email,
+          newUser.name,
+          emailVerificationToken
+        );
+        logger.info('Verification email sent', { email: newUser.email });
+      } catch (emailError) {
+        logger.error('Failed to send verification email', {
+          email: newUser.email,
+          error: emailError instanceof Error ? emailError.message : 'Unknown email error'
+        });
+        // Don't throw error here - user is still registered
+      }
+
       return {
         user: this.sanitizeUser(newUser),
         emailVerificationToken
@@ -64,6 +81,16 @@ export class AuthService {
           userAgent: req.get('user-agent')
         });
         throw new AppError('Email hoặc mật khẩu không đúng', 401);
+      }
+
+      // Check if email is verified
+      if (!user.isEmailVerified) {
+        logger.warn('Login attempt with unverified email', {
+          email,
+          ip: req.ip,
+          userId: user._id
+        });
+        throw new AppError('Vui lòng xác thực email trước khi đăng nhập', 403);
       }
 
       // Check if account is locked
@@ -135,13 +162,28 @@ export class AuthService {
           name: googleUser.displayName,
           email: googleUser.email,
           password: crypto.randomBytes(32).toString('hex'), // Random password
-          isEmailVerified: googleUser.emailVerified,
+          isEmailVerified: true, // Google đã verify email rồi
           googleId: googleUser.uid,
           avatar: googleUser.photoURL
         });
+
+        // Send welcome email for new Google users
+        try {
+          await emailService.sendWelcomeEmail(user.email, user.name);
+          logger.info('Welcome email sent to Google user', { email: user.email });
+        } catch (emailError) {
+          logger.error('Failed to send welcome email to Google user', {
+            email: user.email,
+            error: emailError instanceof Error ? emailError.message : 'Unknown error'
+          });
+          // Don't throw error here - user is still registered
+        }
       } else if (!user.googleId) {
         // Link Google account to existing user
         user.googleId = googleUser.uid;
+        if (!user.isEmailVerified) {
+          user.isEmailVerified = true; // Auto verify if linking with verified Google account
+        }
         await user.save();
       }
 
@@ -244,6 +286,18 @@ export class AuthService {
         userId: user._id,
         email: user.email
       });
+
+      // Send welcome email
+      try {
+        await emailService.sendWelcomeEmail(user.email, user.name);
+        logger.info('Welcome email sent', { email: user.email });
+      } catch (emailError) {
+        logger.error('Failed to send welcome email', {
+          email: user.email,
+          error: emailError instanceof Error ? emailError.message : 'Unknown email error'
+        });
+        // Don't throw error here - email verification was successful
+      }
     } catch (error) {
       throw error;
     }
@@ -265,7 +319,18 @@ export class AuthService {
       user.passwordResetExpires = resetExpires;
       await user.save();
 
-      // In real app, send email with reset token
+      // Send password reset email
+      try {
+        await emailService.sendPasswordResetEmail(user.email, user.name, resetToken);
+        logger.info('Password reset email sent', { email: user.email });
+      } catch (emailError) {
+        logger.error('Failed to send password reset email', {
+          email: user.email,
+          error: emailError instanceof Error ? emailError.message : 'Unknown email error'
+        });
+        // Don't throw error here - token was saved successfully
+      }
+
       logger.info('Password reset requested', {
         userId: user._id,
         email: user.email

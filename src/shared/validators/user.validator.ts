@@ -62,7 +62,6 @@ export const passwordResetConfirmSchema = Joi.object({
 
 // Email verification
 export const emailVerificationSchema = Joi.object({
-    email: Joi.string().email().required(),
     token: Joi.string().required()
 });
 
