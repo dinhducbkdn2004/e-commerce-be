@@ -368,6 +368,36 @@ export class AuthService {
     }
   }
 
+  async resendVerificationEmail(email: string) {
+    try {
+      const user = await this.authRepo.findByEmail(email);
+      if (!user) {
+        throw new AppError('Email not found', 404);
+      }
+
+      if (user.isEmailVerified) {
+        throw new AppError('Email already verified', 400);
+      }
+
+      const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+      const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      user.emailVerificationToken = emailVerificationToken;
+      user.emailVerificationExpires = emailVerificationExpires;
+      await user.save();
+
+      await emailService.sendVerificationEmail(user.email, user.name, emailVerificationToken);
+
+      logger.info('Verification email sent', { email: user.email });
+    } catch (error) {
+      logger.error('Resend verification email error', {
+        email,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
   private generateAccessToken(user: IUser): string {
     const payload = {
       id: user._id,

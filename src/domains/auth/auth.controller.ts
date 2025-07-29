@@ -8,7 +8,7 @@ export class AuthController {
 
   async register(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      logger.info('Registration request received', {
+      logger.info('Registration request recWeived', {
         ip: req.ip,
         email: req.body.email
       });
@@ -185,6 +185,17 @@ export class AuthController {
       await this.authService.resetPassword(token, password);
       
       return ResponseHelper.success(res, null, Messages.AUTH.PASSWORD_RESET_SUCCESS.en, Messages.AUTH.PASSWORD_RESET_SUCCESS.vi);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { email } = req.body;
+      await this.authService.resendVerificationEmail(email);
+      
+      return ResponseHelper.success(res, null, Messages.AUTH.VERIFICATION_EMAIL_SENT.en, Messages.AUTH.VERIFICATION_EMAIL_SENT.vi);
     } catch (error) {
       next(error);
     }

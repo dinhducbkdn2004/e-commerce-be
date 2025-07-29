@@ -85,3 +85,7 @@ pids
 
 # Yarn Integrity file
 .yarn-integrity
+
+# Documentation files (except README.md)
+*.md
+!README.md
