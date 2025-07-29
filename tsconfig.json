@@ -12,7 +12,9 @@
     "isolatedModules": true,
     "declaration": true,
     "sourceMap": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "jsx": "react",
+    "allowJs": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

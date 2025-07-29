@@ -40,5 +40,10 @@ export const config = {
       sameSite: 'strict' as const,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
       path: '/'
-    }
+    },
+    
+    // Email Service (Resend)
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_DOMAIN: process.env.RESEND_DOMAIN || 'beeluxe.com',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
 } as const;
