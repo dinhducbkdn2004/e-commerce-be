@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { Request } from 'express';
 import { AuthRepository } from './auth.repository';
-import { EmailVerificationDTO, UserPasswordResetDTO } from '../../dtos/user.dto';
 import { AppError } from '../../shared/middlewares/errorHandler';
 import { logger } from '../../shared/utils/logger';
 import { config } from '../../shared/config';
@@ -351,7 +350,6 @@ export class AuthService {
       if (user.passwordResetExpires && user.passwordResetExpires < new Date()) {
         throw new AppError('Reset token has expired', 400);
       }
-
       const hashedPassword = await bcrypt.hash(newPassword, 12);
       
       user.password = hashedPassword;
