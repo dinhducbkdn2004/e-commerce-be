@@ -181,8 +181,8 @@ export class AuthController {
 
   async resetPassword(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const { token, password } = req.body;
-      await this.authService.resetPassword(token, password);
+      const { token, newPassword } = req.body;
+      await this.authService.resetPassword(token, newPassword);
       
       return ResponseHelper.success(res, null, Messages.AUTH.PASSWORD_RESET_SUCCESS.en, Messages.AUTH.PASSWORD_RESET_SUCCESS.vi);
     } catch (error) {

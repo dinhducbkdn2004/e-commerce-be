@@ -36,40 +36,36 @@ export const VerificationEmail = ({
 
         <Section style={section}>
           <Heading style={h1}>Welcome to BeeLuxe!</Heading>
-          
           <Text style={text}>
-            Hi {userName},
+            Hello {userName},
           </Text>
-          
           <Text style={text}>
-            Thank you for creating an account with BeeLuxe. To complete your registration and start shopping our luxury collection, please verify your email address.
+            Thank you for registering at <b>BeeLuxe</b> – your destination for premium products and a world-class shopping experience.
           </Text>
-
+          <Text style={text}>
+            To complete your registration and start your shopping journey, please verify your email address by clicking the button below:
+          </Text>
           <Section style={buttonSection}>
             <Button style={button} href={verificationUrl}>
-              Verify Email Address
+              Verify Account
             </Button>
           </Section>
-
           <Text style={text}>
-            Or copy and paste this URL into your browser:
+            Or copy and paste this link into your browser:
           </Text>
-          
           <Text style={linkText}>
             {verificationUrl}
           </Text>
-
           <Text style={text}>
-            This verification link will expire in 24 hours for security reasons.
+            <b>Note:</b> This verification link will expire in 24 hours for security reasons.
           </Text>
-
           <Text style={text}>
-            If you didn't create this account, you can safely ignore this email.
+            If you did not request this registration, please ignore this email or contact us for support.
           </Text>
-
           <Text style={footer}>
             Best regards,<br />
-            The BeeLuxe Team
+            The BeeLuxe Team<br />
+            <span style={{color:'#9333ea'}}>Hotline: 1900 9999</span> | <a href="https://beeluxe.vn" style={{color:'#9333ea'}}>beeluxe.vn</a>
           </Text>
         </Section>
       </Container>
