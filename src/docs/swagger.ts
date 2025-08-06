@@ -180,7 +180,11 @@ To begin using the API, register a new account using the Authentication endpoint
       }
     }
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/docs/*.docs.ts'],
+  apis: [
+    './src/docs/*.docs.ts',
+    './src/routes/*.ts',
+    './src/domains/*/*.routes.ts'
+  ],
 };
 
 export const specs = swaggerJsdoc(options);
