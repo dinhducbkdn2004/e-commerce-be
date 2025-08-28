@@ -11,10 +11,33 @@ const options: swaggerJsdoc.Options = {
       description: `
 ## API Documentation for E-Commerce Backend
 
-This documentation provides details for all available API endpoints.
+This comprehensive API supports a full-featured e-commerce platform with the following capabilities:
+
+### Features
+- **Authentication**: User registration, login, password reset, email verification
+- **User Management**: Profile management, address book
+- **Product Catalog**: Browse products, categories, search and filtering
+- **Shopping Cart**: Add, update, remove items from cart
+- **Order Management**: Create orders, track status, order history
+- **Wishlist**: Save favorite products for later
+- **Loyalty Program**: Earn and redeem points, tier system
+- **Admin Functions**: Manage orders, view analytics
+
+### API Endpoints Overview
+- \`/api/v1/auth/*\` - Authentication endpoints
+- \`/api/v1/users/*\` - User management
+- \`/api/v1/products/*\` - Product catalog
+- \`/api/v1/categories/*\` - Product categories
+- \`/api/v1/cart/*\` - Shopping cart management
+- \`/api/v1/orders/*\` - Order management
+- \`/api/v1/address/*\` - Address management
+- \`/api/v1/wishlist/*\` - Wishlist management
+- \`/api/v1/loyalty/*\` - Loyalty program
 
 ### Getting Started
-To begin using the API, register a new account using the Authentication endpoints.
+1. Register a new account using the Authentication endpoints
+2. Login to receive a Bearer token
+3. Include the token in the Authorization header for protected endpoints
       `,
       license: {
         name: 'MIT',
@@ -174,6 +197,89 @@ To begin using the API, register a new account using the Authentication endpoint
             },
             error: {
               type: 'string'
+            }
+          }
+        },
+        ApiResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean'
+            },
+            message: {
+              type: 'string'
+            },
+            messageVi: {
+              type: 'string'
+            },
+            data: {
+              type: 'object'
+            },
+            timestamp: {
+              type: 'string',
+              format: 'date-time'
+            }
+          }
+        },
+        Pagination: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'integer'
+            },
+            pages: {
+              type: 'integer'
+            },
+            total: {
+              type: 'integer'
+            },
+            hasNext: {
+              type: 'boolean'
+            },
+            hasPrev: {
+              type: 'boolean'
+            }
+          }
+        }
+      },
+      responses: {
+        UnauthorizedError: {
+          description: 'Access token is missing or invalid',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiResponse'
+              }
+            }
+          }
+        },
+        ForbiddenError: {
+          description: 'Insufficient permissions',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiResponse'
+              }
+            }
+          }
+        },
+        NotFoundError: {
+          description: 'Resource not found',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiResponse'
+              }
+            }
+          }
+        },
+        BadRequestError: {
+          description: 'Bad request - validation error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ApiResponse'
+              }
             }
           }
         }

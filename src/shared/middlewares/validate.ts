@@ -9,7 +9,7 @@ export const validate = (schema: Joi.ObjectSchema) => {
                 status: 'error',
                 message: error.details[0].message,
             });
-            return; // Thêm return để đảm bảo function kết thúc ở đây
+            return; 
         }
         next();
     };
