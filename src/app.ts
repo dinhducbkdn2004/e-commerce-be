@@ -10,7 +10,6 @@ import { rateLimitMiddleware } from './shared/middlewares/rateLimitMiddleware';
 import { morganMiddleware } from './shared/utils/morganConfig';
 import { errorHandler } from './shared/middlewares/errorHandler';
 import { logger } from './shared/utils/logger';
-import { sessionConfig } from './shared/middlewares/sessionMiddleware';
 import { attachCSRFToken } from './shared/middlewares/csrfProtection';
 import { checkTokenBlacklist } from './shared/middlewares/tokenBlacklist';
 import { redisClient } from './shared/utils/redis';
@@ -32,9 +31,6 @@ app.use(corsMiddleware);
 // Cookie parser
 app.use(cookieParser());
 
-// Session management
-app.use(sessionConfig);
-
 // CSRF token attachment
 app.use(attachCSRFToken);
 
@@ -51,16 +47,14 @@ app.use(morganMiddleware);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Body parsing middleware
-
 // Swagger API Documentation
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {
-  explorer: true, // Cho phép khám phá schema
-  customSiteTitle: 'E-Commerce API Documentation', // Chỉ tùy chỉnh tiêu đề trang
+  explorer: true,
+  customSiteTitle: 'E-Commerce API Documentation',
   swaggerOptions: {
-    persistAuthorization: true, // Lưu trữ token xác thực
-    docExpansion: 'list', // Mở rộng tags, default của Swagger
-    filter: true // Cho phép tìm kiếm API
+    persistAuthorization: true,
+    docExpansion: 'list', 
+    filter: true 
   }
 }));
 
@@ -74,12 +68,18 @@ app.use((req, res) => {
     status: 'error',
     message: `Route ${req.originalUrl} not found`,
     availableRoutes: [
-      'GET /',
       'GET /health',
-      'GET /api/v1/users',
-      'POST /api/v1/users',
+      'GET /docs',
       'POST /api/v1/auth/login',
-      'GET /docs' // Added Swagger documentation route
+      'POST /api/v1/auth/register',
+      'GET /api/v1/users',
+      'GET /api/v1/products',
+      'GET /api/v1/categories',
+      'GET /api/v1/cart',
+      'GET /api/v1/orders',
+      'GET /api/v1/address',
+      'GET /api/v1/wishlist',
+      'GET /api/v1/loyalty'
     ]
   });
 });
